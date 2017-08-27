@@ -98,20 +98,15 @@ def changeColors(inputImage):
     return newIm
 
 
-# Liberty Prime Quotes
-with open('quotes.txt', 'r') as quotefile:
-    quotes = []
-    for line in quotefile:
-        quotes.append(line.strip())
-
 # Defines Bot, Bot prefix, bot description, and the server
 bot = commands.Bot(command_prefix = '%', description = 'Deliverer of Freedom and Democracy. Also serving discord channels near you!')
 user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
 
 @bot.event
 async def on_ready():
-     await bot.send_message(bot.get_channel('335560493454327808'),
-                            'Liberty Prime is online. All systems nominal. Weapons hot. Mission: the destruction of any and all Chinese communists')
+    discord.opus.load_opus('libopus-0.x64.dll')
+     #await bot.send_message(bot.get_channel('335560493454327808'),
+     #                       'Liberty Prime is online. All systems nominal. Weapons hot. Mission: the destruction of any and all Chinese communists')
 
 @bot.event
 async def on_error():
@@ -149,7 +144,15 @@ async def sendfreedom(ctx):
 
 @bot.command()
 async def prime():
+    with open('quotes.txt', 'r') as quotefile:
+        quotes = [line.strip() for line in quotefile]
     await bot.say(quotes[randint(0, len(quotes)-1)])
+
+@bot.command()
+async def primevoice():
+    voice = await bot.join_voice_channel(bot.get_channel('335560493458522112'))
+    player = voice.create_ffmpeg_player('quotes.m4a')
+    player.start()
 
 @bot.command(pass_context = True)
 async def addroll(ctx):
@@ -159,11 +162,12 @@ async def addroll(ctx):
         if role.name not in ['Peasants', 'Mod', 'Tinkerer', 'Bot']:
             possible_roles.append(role)
     roles = []
+    msg = ctx.message.content.split('addroll ')[1]
     try:
         for role in possible_roles:
-            if role.name in ctx.message.content:
+            if role.name == msg:
                 roles.append(role)
-        if len(roles)>0:
+        if len(roles) > 0:
             await bot.add_roles(ctx.message.author, roles)
         else:
             await bot.say('No eligible roles')
@@ -210,6 +214,7 @@ async def file(ctx):
     with urllib.request.urlopen(req) as url:
         with open('player_country_list.txt', 'wb') as f:
             f.write(url.read())
+    await bot.say('Got the file')
 
 @bot.command(pass_context = True)
 async def list(ctx):
@@ -247,13 +252,13 @@ async def create(ctx):
 @bot.command(pass_context = True)
 async def shutdown(ctx):
     if ctx.message.author.id == '196866248984887296':
-        await bot.send_message(bot.get_channel('335560493454327808'), 'Initiate shutdown protocal')
+        #await bot.send_message(bot.get_channel('335560493454327808'), 'Initiate shutdown protocal')
         await bot.close()
     else:
         hacker = ctx.message.author
         await bot.say('Communist hacking detected, initiating freedom protocol!')
-        await bot.say('\U0001F4A5' + ' ' + '\U0001F1FA' + '\U0001F1F8' + ' ' + hacker.mention +
-                      ', HAVE SOME FREEDOM, COMMUNIST SCUM! ' + '\U0001F1FA' + '\U0001F1F8' + ' ' + '\U0001F4A5')
+        await bot.say('\U0001F4A5'+' '+'\U0001F1FA'+'\U0001F1F8'+' '+hacker.mention+
+                      ', HAVE SOME FREEDOM, COMMUNIST SCUM! '+'\U0001F1FA'+'\U0001F1F8'+' '+'\U0001F4A5')
 
 
 bot.run('MzUxMTUzMzI4Mzg4MDQ2ODU5.DIOclw.pyZAa0BWpblMimYlpvLZcoOiEXo')
