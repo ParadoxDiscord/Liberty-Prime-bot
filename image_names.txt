@@ -1,0 +1,2 @@
+Input Image = 1444_map - Master Copy.png
+Output Image = 1444_map.png

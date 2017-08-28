@@ -1,0 +1,5 @@
+Muscovy = Muscowy
+Vijayanagar = Vijaynagara
+Tunis = Tunisia
+Mamluks = Burgi
+Hejaz = Hedjaz
