@@ -1,2 +1,5 @@
 discord
 random
+PIL
+sys
+urllib
