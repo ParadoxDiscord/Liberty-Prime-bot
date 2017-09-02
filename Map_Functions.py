@@ -24,16 +24,18 @@ class Country:
     def findColor(self):
         self.getFileName()
         countryFile = open(createDirectory()+self.file_name+'.txt')
-        for n in range(5):
+        if self.name in ['Kiev','Iceland']: r = 3
+        elif self.name in ['Dithmarschen']: r = 6
+        else: r = 5
+        for n in range(r):
             line = countryFile.readline()
-        line = line.split('{'); line = line[1].split('}')
-        line = line[0].strip(); line = line.split()
+        line = line.split('{')[1].split('}')[0].strip().split()
         self.color = (int(line[0]), int(line[1]), int(line[2]))
 
 def collectCountries():
     countryList = []
     overlord = None
-    with open('player_country_list.txt', 'r') as countryFile:
+    with open('country_list.txt', 'r') as countryFile:
         for line in countryFile:
             line = line.strip()
             if '-' not in line:
