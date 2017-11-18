@@ -324,4 +324,4 @@ async def shutdown(ctx):
                       ', HAVE SOME FREEDOM, COMMUNIST SCUM! '+'\U0001F1FA'+'\U0001F1F8'+' '+'\U0001F4A5')
 
 
-bot.run('MzUwMTI2MzEwMDk1MzIzMTM4.DH_h_g.jxUX0josU7SPHqBCZwb4N-yGSf8')
+bot.run()
