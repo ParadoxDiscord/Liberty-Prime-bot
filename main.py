@@ -5,6 +5,7 @@ import urllib.request
 from discord.ext import commands
 from Map_Functions import *
 
+QUOTE_FOLDER = "C:\\Users\\Brandon\\Desktop\\Python\\discord bots\\quotes\\" #folder containing all the 
 
 # Defines Bot, Bot prefix, bot description, and the server
 bot = commands.Bot(command_prefix = '!', description = 'Deliverer of Freedom and Democracy. Also serving discord channels near you!')
@@ -61,38 +62,53 @@ async def freedom(ctx):
 @bot.command(pass_context = True)
 async def prime(ctx):
     """Liberty Prime says a quote in a text channel, and if in one, in a voice channel."""
-    quotes = []
-    with open('C:\\Users\\Brandon\\Desktop\\Python\\discord bots\\quotes\\quotes.txt', 'r') as quotefile:
+    if not bot.is_voice_connected(ctx.message.server): #Ignores command if bot not in voice
+        await bot.say("I'm not in voice at the moment")
+        return
+    if bot.player.is_playing(): #Ignores command if bot is already playing a voice clip
+        await bot.say("Currently processing other voice command")
+        return
+    quotes = [] #Creates list of quotes
+    with open(QUOTE_FOLDER + 'quotes.txt', 'r') as quotefile:
         for line in quotefile:
             quotes.append(line.strip())
-    number = randint(0, len(quotes)-1)
-    await bot.say(quotes[number])
-    if bot.is_voice_connected(bot.get_server('335560493454327808')):
-        for x in bot.voice_clients:
-            if x.server == ctx.message.server:
-                voice = x
-        player = voice.create_ffmpeg_player('C:\\Users\\Brandon\\Desktop\\Python\\discord bots\\quotes\\quote #{}.wav').format(str(number+1))
-        player.start()
+    number = randint(0, len(quotes)-1) #Generates a random number
+    await bot.say(quotes[number]) #Responds with the text of the voice clip
+    voice = bot.voice_client_in(ctx.message.server) #Gets the active voice client
+    player = voice.create_ffmpeg_player(QUOTE_FOLDER +'quote #{}.wav'.format(str(number+1))) #Gets the voice clip and creates a ffmpeg player
+    bot.player = player #Assigns the player to the bot
+    player.start() #Plays the voice clip
 
-@bot.command()
-async def join():
+@bot.command(pass_context = True)
+async def join(ctx):
     """Makes Liberty Prime join the voice channel."""
-    if not bot.is_voice_connected(bot.get_server('335560493454327808')):
-        voice = await bot.join_voice_channel(bot.get_channel('335560493458522112'))
-        player = voice.create_ffmpeg_player('C:\\Users\\Brandon\\Desktop\\Python\\discord bots\\quotes\\join.wav')
-        player.start()
-    else:
-        await bot.say('I am already in a voice channel.')
+    authorVoiceChannel = ctx.message.author.voice_channel #Gets the voice channel the author is in
+    if authorVoiceChannel is None: #Ignores the command if the author is not in voice
+        await bot.say("You are not in a voice channel right now")
+        return
+    if bot.is_voice_connected(ctx.message.server):
+        voiceChannel = bot.voice_client_in(ctx.message.server).channel
+        if voiceChannel == authorVoiceChannel: #Ignores the command if the bot is already in the author's voice channel
+            await bot.say("I'm already in your voice channel")
+            return
+        else: #If the bot is connected to a different voice channel than the author
+            bot.player.stop() #stops any active voice clip
+            voice = bot.voice_client_in(ctx.message.server)
+            await voice.move_to(authorVoiceChannel) #Moves the bot to the new channel
+    else: #If the bot is not connected to voice
+        voice = await bot.join_voice_channel(authorVoiceChannel) #Joins the author's voice channel
+    await bot.say("Joining voice channel...")
+    player = voice.create_ffmpeg_player(QUOTE_FOLDER + 'join.wav') #Creates an ffmpeg player
+    bot.player = player
+    player.start() #Plays joining voice clip
 
 @bot.command(pass_context = True)
 async def leave(ctx):
     """Makes Liberty Prime leave the voice channel."""
-    if bot.is_voice_connected(bot.get_server('335560493454327808')):
-        for x in bot.voice_clients:
-            if x.server == ctx.message.server:
-                return await x.disconnect()
-        return await bot.say('I am not connected to any voice channel on this server.')
-    else:
+    if bot.is_voice_connected(ctx.message.server):
+        await bot.voice_client_in(ctx.message.server).disconnect() #Disconnect from voice
+        return await bot.say('I have disconnected from voice channels in this server.')
+    else: #If the bot is not connected to voice, do nothing
         return await bot.say('I am not connected to any voice channel on this server.')
 
 @bot.command(pass_context = True)
